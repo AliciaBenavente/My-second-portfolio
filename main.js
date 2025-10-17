@@ -158,27 +158,81 @@ function createWallWithHoles({ wallWidth, wallHeight, wallDepth, material, posit
   finalWall.receiveShadow = true;
   scene.add(finalWall);
 };
+// createWallWithHoles({
+//   wallWidth: wallsWidth,
+//   wallHeight: wallsHeight,
+//   wallDepth: wallsThickness,
+//   material: materials.walls,
+//   position: [0, wallsHeight / 2, -wallsDepth / 2],
+//   holes: [
+//     {
+//       width: 8,
+//       height: 4,
+//       position: [-5, 0, 0]
+//     },
+//     {
+//       width: 8,
+//       height: 4,
+//       position: [5, 0, 0]
+//     }
+//   ]
+// });
+
+// const windowGlassGeometry = new THREE.PlaneGeometry(8, 4);
+// const leftWindowGlass = new THREE.Mesh(windowGlassGeometry, materials.frontWindow);
+// leftWindowGlass.position.set(-5, wallsHeight / 2, - wallsDepth / 2);
+// leftWindowGlass.castShadow = false;
+// leftWindowGlass.receiveShadow = false;
+// const rightWindowGlass = new THREE.Mesh(windowGlassGeometry, materials.frontWindow);
+// rightWindowGlass.position.set(5, wallsHeight / 2, - wallsDepth / 2);
+// rightWindowGlass.castShadow = false;
+// rightWindowGlass.receiveShadow = false;
+
+// scene.add(leftWindowGlass, rightWindowGlass);
+
+// //////////////////////////
+function addGlassToWallHoles({ holes, wallPosition, wallRotation = [0, 0, 0], wallDepth, material, offset = 0.01 }) {
+  for (const hole of holes) {
+    const { width, height, position: localPos } = hole;
+
+    // Calculamos posición global del cristal
+    const x = wallPosition[0] + localPos[0];
+    const y = wallPosition[1] + localPos[1];
+    const z = wallPosition[2] + localPos[2] + wallDepth / 2 + offset;
+
+    const glassGeometry = new THREE.PlaneGeometry(width, height);
+    const glass = new THREE.Mesh(glassGeometry, material);
+
+    glass.position.set(x, y, z);
+    glass.rotation.set(...wallRotation);
+    glass.castShadow = false;
+    glass.receiveShadow = false;
+
+    scene.add(glass);
+  }
+};
+const holes = [
+  { width: 8, height: 4, position: [-5, 0, 0] },
+  { width: 8, height: 4, position: [5, 0, 0] }
+];
+
 createWallWithHoles({
   wallWidth: wallsWidth,
   wallHeight: wallsHeight,
   wallDepth: wallsThickness,
   material: materials.walls,
   position: [0, wallsHeight / 2, -wallsDepth / 2],
-  holes: [
-    {
-      width: 8,
-      height: 4,
-      position: [-5, 0, 0]
-    },
-    {
-      width: 8,
-      height: 4,
-      position: [5, 0, 0]
-    }
-  ]
+  holes
 });
 
+addGlassToWallHoles({
+  holes,
+  wallPosition: [0, wallsHeight / 2, -wallsDepth / 2],
+  wallDepth: wallsThickness,
+  material: materials.frontWindow
+});
 
+// //////////////////////////
 
 // DOOR GLASS
 const glassRadius = 0.9;
